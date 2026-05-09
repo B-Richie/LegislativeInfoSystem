@@ -1,0 +1,37 @@
+﻿@page "/legislator-form"
+@using LegislativeInfoSystem.ServiceInterfaces
+@inject ILegislatorService LegislatorService
+@inject NavigationManager Nav
+
+<h2>Add Legislator</h2>
+
+<EditForm Model="model" OnValidSubmit="Submit" style="max-width: 500px;">
+    <DataAnnotationsValidator />
+
+    <div class="mb-3">
+        <label class="form-label">First Name</label>
+        <InputText class="form-control" @bind-Value="model.FirstName" />
+        <ValidationMessage For="@(() => model.FirstName)" />
+    </div>
+    <div class="mb-3">
+        <label class="form-label">Last Name</label>
+        <InputText class="form-control" @bind-Value="model.LastName" />
+        <ValidationMessage For="@(() => model.LastName)" />
+    </div>
+    <div class="mb-3">
+        <label class="form-label">Hometown</label>
+        <InputText class="form-control" @bind-Value="model.Hometown" />
+        <ValidationMessage For="@(() => model.Hometown)" />
+    </div>
+    <button type="submit" class="btn btn-primary">Submit</button>
+</EditForm>
+
+@code {
+    private LegislatorDTO model = new();
+
+    private async Task Submit()
+    {
+        await LegislatorService.AddAsync(model);
+        Nav.NavigateTo("/legislators");
+    }
+}

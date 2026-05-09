@@ -1,0 +1,47 @@
+﻿@page "/legislators"
+@using LegislativeInfoSystem.ServiceInterfaces
+@inject ILegislatorService LegislatorService
+
+<h2>Legislators</h2>
+
+<a class="btn btn-primary mb-4" href="/legislator-form">Add Legislator</a>
+
+@if (legislators == null)
+{
+    <p>Loading...</p>
+}
+else if (!legislators.Any())
+{
+    <p>No legislators found.</p>
+}
+else
+{
+    <table class="table table-striped">
+        <thead>
+            <tr>
+                <th>First Name</th>
+                <th>Last Name</th>
+                <th>Hometown</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var l in legislators)
+            {
+                <tr>
+                    <td>@l.FirstName</td>
+                    <td>@l.LastName</td>
+                    <td>@l.Hometown</td>
+                </tr>
+            }
+        </tbody>
+    </table>
+}
+
+@code {
+    private List<Legislator>? legislators;
+
+    protected override async Task OnInitializedAsync()
+    {
+        legislators = await LegislatorService.GetAllAsync();
+    }
+}

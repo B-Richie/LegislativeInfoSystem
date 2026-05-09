@@ -1,0 +1,39 @@
+﻿@page "/legislation"
+@using LegislativeInfoSystem.ServiceInterfaces
+@inject ILegislationService LegislationService
+
+<h2>Legislation</h2>
+
+<a class="btn btn-primary mb-4" href="/legislation-form">Add Legislation</a>
+
+@if (legislation == null)
+{
+    <p>Loading...</p>
+}
+else if (!legislation.Any())
+{
+    <p>No legislation found.</p>
+}
+else
+{
+    @foreach (var item in legislation)
+    {
+        <div class="card mb-3 p-4">
+            <h5>@item.Title</h5>
+            <p>@item.LegislationText</p>
+            @if (item.Sponsors != null && item.Sponsors.Any())
+            {
+                <p><strong>Sponsors:</strong> @string.Join(", ", item.Sponsors.Select(s => $"{s.FirstName} {s.LastName}"))</p>
+            }
+        </div>
+    }
+}
+
+@code {
+    private List<Legislation>? legislation;
+
+    protected override async Task OnInitializedAsync()
+    {
+        legislation = await LegislationService.GetAllAsync();
+    }
+}

@@ -1,0 +1,57 @@
+﻿@page "/legislation-form"
+@using LegislativeInfoSystem.ServiceInterfaces
+@inject ILegislationService LegislationService
+@inject ILegislatorService LegislatorService
+@inject NavigationManager Nav
+
+<h2>Add Legislation</h2>
+
+<EditForm Model="model" OnValidSubmit="Submit" style="max-width: 600px;">
+    <DataAnnotationsValidator />
+
+    <div class="mb-3">
+        <label class="form-label">Legislation Title</label>
+        <InputText class="form-control" @bind-Value="model.Title" />
+        <ValidationMessage For="@(() => model.Title)" />
+    </div>
+    <div class="mb-3">
+        <label class="form-label">Legislation Text</label>
+        <InputTextArea class="form-control" rows="5" @bind-Value="model.LegislationText" />
+        <ValidationMessage For="@(() => model.LegislationText)" />
+    </div>
+    <div class="mb-3">
+        <label class="form-label">Sponsors</label>
+        <select class="form-select" multiple @onchange="OnSponsorsChanged">
+            @foreach (var legislator in availableLegislators)
+            {
+                <option value="@legislator.Id">@legislator.FirstName @legislator.LastName</option>
+            }
+        </select>
+        <small class="text-muted">Hold Ctrl to select multiple sponsors.</small>
+    </div>
+    <button type="submit" class="btn btn-primary">Submit</button>
+</EditForm>
+
+@code {
+    private LegislationDTO model = new();
+    private List<Legislator> availableLegislators = new();
+
+    protected override async Task OnInitializedAsync()
+    {
+        availableLegislators = await LegislatorService.GetAllAsync();
+    }
+
+    private void OnSponsorsChanged(ChangeEventArgs e)
+    {
+        if (e.Value is string[] selected)
+        {
+            model.SponsorIds = selected.Select(int.Parse).ToList();
+        }
+    }
+
+    private async Task Submit()
+    {
+        await LegislationService.AddAsync(model);
+        Nav.NavigateTo("/legislation");
+    }
+}
